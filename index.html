@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: var(--tg-theme-bg-color); /* Цвет фона из темы Telegram */
+            color: var(--tg-theme-text-color);         /* Цвет текста из темы Telegram */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .user-card {
+            background-color: var(--tg-theme-secondary-bg-color);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="user-card">
+        <h1>Привет, <span id="username">Гость</span>!</h1>
+        <p>Добро пожаловать в Mini App.</p>
+        <div id="user-data"></div>
+    </div>
+
+    <button id="main-action">Записаться на сеанс</button>
+
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+
+        // Сообщаем Telegram, что приложение готово
+        tg.ready();
+        tg.expand(); // Разворачиваем на все окно
+
+        // Получаем данные о пользователе
+        const user = tg.initDataUnsafe?.user;
+
+        if (user) {
+            document.getElementById('username').innerText = user.first_name;
+            document.getElementById('user-data').innerHTML = `
+                <p>Ваш ID: ${user.id}</p>
+                <p>Username: @${user.username || 'не указан'}</p>
+            `;
+        }
+
+        // Работа с главной кнопкой Telegram
+        const mainBtn = tg.MainButton;
+        mainBtn.setText("ПОДТВЕРДИТЬ ЗАПИСЬ");
+        mainBtn.textColor = "#FFFFFF";
+        mainBtn.color = "#2cab37";
+
+        document.getElementById('main-action').addEventListener('click', () => {
+            mainBtn.show(); // Показываем нижнюю кнопку Telegram
+        });
+
+        // Обработка клика по главной кнопке
+        tg.onEvent('mainButtonClicked', function(){
+            tg.sendData("Пользователь записался на сеанс!"); 
+            // Это отправит сообщение боту и закроет приложение
+        });
+    </script>
+</body>
+</html>
